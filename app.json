@@ -1,0 +1,19 @@
+{
+  "expo": {
+    "name": "MIST",
+    "slug": "mist-mobile",
+    "scheme": "mist",
+    "version": "0.1.0",
+    "orientation": "portrait",
+    "plugins": [
+      "expo-router",
+      "expo-secure-store"
+    ],
+    "android": {
+      "package": "com.mist.mobile"
+    },
+    "ios": {
+      "bundleIdentifier": "com.mist.mobile"
+    }
+  }
+}

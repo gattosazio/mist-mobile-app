@@ -1,0 +1,136 @@
+import { StyleSheet } from "react-native";
+
+export const screenStyles = StyleSheet.create({
+  screen: {
+    flex: 1,
+    backgroundColor: "#020617",
+    padding: 20,
+    gap: 16,
+  },
+  card: {
+    backgroundColor: "#09111f",
+    borderColor: "#1e293b",
+    borderRadius: 20,
+    borderWidth: 1,
+    gap: 14,
+    padding: 20,
+  },
+  sectionHeader: {
+    gap: 6,
+  },
+  eyebrow: {
+    color: "#f4c95d",
+    fontSize: 12,
+    fontWeight: "700",
+    letterSpacing: 1.2,
+    textTransform: "uppercase",
+  },
+  title: {
+    color: "#f8fafc",
+    fontSize: 28,
+    fontWeight: "700",
+  },
+  body: {
+    color: "#94a3b8",
+    fontSize: 15,
+    lineHeight: 22,
+  },
+  meta: {
+    color: "#cbd5e1",
+    fontSize: 14,
+  },
+  field: {
+    gap: 8,
+  },
+  label: {
+    color: "#e2e8f0",
+    fontSize: 13,
+    fontWeight: "600",
+  },
+  input: {
+    backgroundColor: "#0f172a",
+    borderColor: "#334155",
+    borderRadius: 14,
+    borderWidth: 1,
+    color: "#f8fafc",
+    fontSize: 16,
+    paddingHorizontal: 14,
+    paddingVertical: 12,
+  },
+  button: {
+    alignItems: "center",
+    backgroundColor: "#f4c95d",
+    borderRadius: 14,
+    paddingHorizontal: 16,
+    paddingVertical: 14,
+  },
+  buttonText: {
+    color: "#111827",
+    fontSize: 15,
+    fontWeight: "700",
+  },
+  secondaryButton: {
+    alignItems: "center",
+    borderColor: "#475569",
+    borderRadius: 14,
+    borderWidth: 1,
+    paddingHorizontal: 16,
+    paddingVertical: 14,
+  },
+  secondaryButtonText: {
+    color: "#e2e8f0",
+    fontSize: 15,
+    fontWeight: "700",
+  },
+  error: {
+    color: "#fca5a5",
+    fontSize: 13,
+  },
+  listContent: {
+    paddingBottom: 20,
+  },
+  userBubble: {
+    alignSelf: "flex-end",
+    backgroundColor: "#1d4ed8",
+    borderRadius: 18,
+    marginBottom: 12,
+    maxWidth: "85%",
+    padding: 14,
+  },
+  assistantBubble: {
+    alignSelf: "flex-start",
+    backgroundColor: "#111827",
+    borderColor: "#1f2937",
+    borderRadius: 18,
+    borderWidth: 1,
+    marginBottom: 12,
+    maxWidth: "85%",
+    padding: 14,
+  },
+  bubbleRole: {
+    color: "#cbd5e1",
+    fontSize: 11,
+    fontWeight: "700",
+    marginBottom: 6,
+    textTransform: "uppercase",
+  },
+  bubbleText: {
+    color: "#f8fafc",
+    fontSize: 15,
+    lineHeight: 22,
+  },
+  composer: {
+    gap: 12,
+  },
+  composerInput: {
+    backgroundColor: "#0f172a",
+    borderColor: "#334155",
+    borderRadius: 16,
+    borderWidth: 1,
+    color: "#f8fafc",
+    maxHeight: 120,
+    minHeight: 88,
+    padding: 14,
+    textAlignVertical: "top",
+  },
+});
