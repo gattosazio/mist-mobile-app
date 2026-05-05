@@ -1,9 +1,31 @@
-import { useMemo, useState } from "react";
-import { Text, TextInput, TouchableOpacity, View } from "react-native";
-import { FlashList } from "@shopify/flash-list";
+import { useState } from "react";
+import {
+  ActivityIndicator,
+  FlatList,
+  KeyboardAvoidingView,
+  Platform,
+  Pressable,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
+} from "react-native";
 import { useAskPolicyQuestion } from "@/src/features/chat/hooks/use-ask-policy-question";
 import { useChatStore } from "@/src/features/chat/store/chat-store";
 import { screenStyles } from "@/src/theme/styles";
+
+const STARTER_PROMPTS = [
+  "What is the current WFH policy?",
+  "How many annual leave days do I get?",
+  "What is the reimbursement process for travel?",
+] as const;
+
+const QUICK_TOPICS = [
+  "Leave policy",
+  "WFH rules",
+  "Travel claims",
+  "Medical benefits",
+] as const;
 
 export default function ChatScreen() {
   const [question, setQuestion] = useState("");
@@ -13,10 +35,10 @@ export default function ChatScreen() {
   const setConversationState = useChatStore((state) => state.setConversationState);
   const askMutation = useAskPolicyQuestion();
 
-  const messages = useMemo(() => thread?.messages ?? [], [thread?.messages]);
+  const messages = thread?.messages ?? [];
 
-  const sendQuestion = async () => {
-    const trimmedQuestion = question.trim();
+  const sendQuestion = async (draft = question) => {
+    const trimmedQuestion = draft.trim();
 
     if (!trimmedQuestion || askMutation.isPending) {
       return;
@@ -29,54 +51,133 @@ export default function ChatScreen() {
     });
     setQuestion("");
 
-    const response = await askMutation.mutateAsync({
-      question: trimmedQuestion,
-      conversationState: thread?.conversationState ?? null,
-    });
+    try {
+      const response = await askMutation.mutateAsync({
+        question: trimmedQuestion,
+        conversationState: thread?.conversationState ?? null,
+      });
 
-    appendMessage(activeThreadId, {
-      id: `${Date.now()}-assistant`,
-      role: "assistant",
-      text: response.answer,
-    });
-    setConversationState(activeThreadId, response.conversationState ?? null);
+      appendMessage(activeThreadId, {
+        id: `${Date.now()}-assistant`,
+        role: "assistant",
+        text: response.answer,
+      });
+      setConversationState(activeThreadId, response.conversationState ?? null);
+    } catch {
+      // The mutation error is surfaced below the composer.
+    }
   };
 
   return (
-    <View style={screenStyles.screen}>
-      <View style={screenStyles.sectionHeader}>
-        <Text style={screenStyles.title}>Policy chat</Text>
-        <Text style={screenStyles.body}>Conversation state is persisted per thread in local app state.</Text>
-      </View>
+    <KeyboardAvoidingView
+      behavior={Platform.OS === "ios" ? "padding" : undefined}
+      keyboardVerticalOffset={Platform.OS === "ios" ? 84 : 0}
+      style={screenStyles.chatScreen}
+    >
+      <View style={screenStyles.chatBackdropTop} />
+      <View style={screenStyles.chatBackdropBottom} />
 
-      <FlashList
-        contentContainerStyle={screenStyles.listContent}
-        data={messages}
-        estimatedItemSize={72}
-        keyExtractor={(item) => item.id}
-        renderItem={({ item }) => (
-          <View style={item.role === "user" ? screenStyles.userBubble : screenStyles.assistantBubble}>
-            <Text style={screenStyles.bubbleRole}>{item.role}</Text>
-            <Text style={screenStyles.bubbleText}>{item.text}</Text>
+      <View style={screenStyles.screenContent}>
+        <View style={screenStyles.chatHeroCard}>
+          <Text style={screenStyles.chatHeroEyebrow}>MIST Assistant</Text>
+          <Text style={screenStyles.chatHeroTitle}>Policy chat</Text>
+          <Text style={screenStyles.chatHeroBody}>
+            Ask policy questions in plain language and get clear answers grounded in your company handbook.
+          </Text>
+
+          <View style={screenStyles.chatTopicRow}>
+            {QUICK_TOPICS.map((topic) => (
+              <TouchableOpacity key={topic} onPress={() => setQuestion(topic)} style={screenStyles.chatTopicChip}>
+                <Text style={screenStyles.chatTopicChipText}>{topic}</Text>
+              </TouchableOpacity>
+            ))}
           </View>
+        </View>
+
+        {messages.length === 0 ? (
+          <View style={screenStyles.chatEmptyCard}>
+            <Text style={screenStyles.chatEmptyTitle}>Start with a policy question</Text>
+            <Text style={screenStyles.chatEmptyBody}>
+              Use a prompt below or ask your own question about leave, WFH, expenses, approvals, or handbook rules.
+            </Text>
+
+            <View style={screenStyles.chatPromptList}>
+              {STARTER_PROMPTS.map((prompt) => (
+                <TouchableOpacity key={prompt} onPress={() => void sendQuestion(prompt)} style={screenStyles.chatPromptChip}>
+                  <Text style={screenStyles.chatPromptChipText}>{prompt}</Text>
+                </TouchableOpacity>
+              ))}
+            </View>
+          </View>
+        ) : (
+          <FlatList
+            contentContainerStyle={screenStyles.chatListContent}
+            data={messages}
+            keyExtractor={(item) => item.id}
+            showsVerticalScrollIndicator={false}
+            style={screenStyles.chatList}
+            renderItem={({ item }) => (
+              <View style={item.role === "user" ? screenStyles.userBubble : screenStyles.assistantBubble}>
+                <Text style={screenStyles.bubbleRole}>{item.role === "user" ? "You" : "MIST"}</Text>
+                <Text style={item.role === "user" ? screenStyles.userBubbleText : screenStyles.bubbleText}>
+                  {item.text}
+                </Text>
+              </View>
+            )}
+          />
         )}
-      />
 
-      {askMutation.error ? <Text style={screenStyles.error}>{askMutation.error.message}</Text> : null}
+        {askMutation.isPending ? (
+          <View style={screenStyles.chatTypingCard}>
+            <View style={screenStyles.chatTypingDots}>
+              <ActivityIndicator color="#1550ff" size="small" />
+            </View>
+            <View style={screenStyles.chatTypingTextWrap}>
+              <Text style={screenStyles.chatTypingTitle}>MIST is preparing an answer</Text>
+              <Text style={screenStyles.chatTypingBody}>Checking the latest configured policy guidance.</Text>
+            </View>
+          </View>
+        ) : null}
 
-      <View style={screenStyles.composer}>
-        <TextInput
-          multiline
-          onChangeText={setQuestion}
-          placeholder="Ask a policy question"
-          placeholderTextColor="#64748b"
-          style={screenStyles.composerInput}
-          value={question}
-        />
-        <TouchableOpacity onPress={sendQuestion} style={screenStyles.button}>
-          <Text style={screenStyles.buttonText}>{askMutation.isPending ? "Sending..." : "Send"}</Text>
-        </TouchableOpacity>
+        <View style={screenStyles.chatComposerCard}>
+          <View style={screenStyles.composer}>
+            <Text style={screenStyles.chatComposerLabel}>Ask a policy question</Text>
+            <TextInput
+              multiline
+              onChangeText={setQuestion}
+              placeholder="For example: What is our WFH policy?"
+              placeholderTextColor="#8a8fa8"
+              style={screenStyles.composerInput}
+              value={question}
+            />
+            <View style={screenStyles.chatShortcutRow}>
+              {STARTER_PROMPTS.slice(0, 2).map((prompt) => (
+                <TouchableOpacity key={prompt} onPress={() => setQuestion(prompt)} style={screenStyles.chatShortcutChip}>
+                  <Text numberOfLines={1} style={screenStyles.chatShortcutChipText}>
+                    {prompt}
+                  </Text>
+                </TouchableOpacity>
+              ))}
+            </View>
+            <View style={screenStyles.chatComposerFooter}>
+              <Text style={screenStyles.chatComposerHint}>Responses are based on your configured company guidance.</Text>
+              <Pressable
+                disabled={askMutation.isPending}
+                onPress={() => void sendQuestion()}
+                style={({ pressed }) => [
+                  screenStyles.chatSendButton,
+                  pressed ? screenStyles.chatSendButtonPressed : null,
+                  askMutation.isPending ? screenStyles.chatSendButtonDisabled : null,
+                ]}
+              >
+                <Text style={screenStyles.chatSendButtonText}>{askMutation.isPending ? "Sending..." : "Send"}</Text>
+              </Pressable>
+            </View>
+          </View>
+
+          {askMutation.error ? <Text style={screenStyles.error}>{askMutation.error.message}</Text> : null}
+        </View>
       </View>
-    </View>
+    </KeyboardAvoidingView>
   );
 }

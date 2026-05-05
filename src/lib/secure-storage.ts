@@ -4,6 +4,7 @@ import { Platform } from "react-native";
 export const storageKeys = {
   authToken: "mist-auth-token",
   authUser: "mist-auth-user",
+  onboardingSeen: "mist-onboarding-seen",
 } as const;
 
 export async function setSecureItem(key: string, value: string) {

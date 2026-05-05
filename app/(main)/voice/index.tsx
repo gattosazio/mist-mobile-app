@@ -14,35 +14,38 @@ export default function VoiceScreen() {
 
   return (
     <View style={screenStyles.screen}>
-      <View style={screenStyles.card}>
-        <Text style={screenStyles.title}>Voice session</Text>
-        <Text style={screenStyles.body}>
-          This scaffold creates and tears down LiveKit sessions against the current backend.
-        </Text>
+      <View style={screenStyles.screenContent}>
+        <View style={screenStyles.card}>
+          <Text style={screenStyles.eyebrow}>Live support</Text>
+          <Text style={screenStyles.title}>Voice session</Text>
+          <Text style={screenStyles.body}>
+            Start or stop a backend-backed voice session without leaving the shared MIST workspace.
+          </Text>
 
-        <Text style={screenStyles.meta}>
-          {activeSession
-            ? `Connected to ${activeSession.roomName} as ${activeSession.participantIdentity}`
-            : "No active session"}
-        </Text>
+          <Text style={screenStyles.meta}>
+            {activeSession
+              ? `Connected to ${activeSession.roomName} as ${activeSession.participantIdentity}`
+              : "No active session"}
+          </Text>
 
-        <TouchableOpacity
-          disabled={isStarting || Boolean(activeSession)}
-          onPress={startSession}
-          style={screenStyles.button}
-        >
-          <Text style={screenStyles.buttonText}>{isStarting ? "Starting..." : "Start voice"}</Text>
-        </TouchableOpacity>
+          <TouchableOpacity
+            disabled={isStarting || Boolean(activeSession)}
+            onPress={startSession}
+            style={screenStyles.button}
+          >
+            <Text style={screenStyles.buttonText}>{isStarting ? "Starting..." : "Start voice"}</Text>
+          </TouchableOpacity>
 
-        <TouchableOpacity
-          disabled={isEnding || !activeSession}
-          onPress={endSession}
-          style={screenStyles.secondaryButton}
-        >
-          <Text style={screenStyles.secondaryButtonText}>{isEnding ? "Ending..." : "End voice"}</Text>
-        </TouchableOpacity>
+          <TouchableOpacity
+            disabled={isEnding || !activeSession}
+            onPress={endSession}
+            style={screenStyles.secondaryButton}
+          >
+            <Text style={screenStyles.secondaryButtonText}>{isEnding ? "Ending..." : "End voice"}</Text>
+          </TouchableOpacity>
 
-        {error ? <Text style={screenStyles.error}>{error}</Text> : null}
+          {error ? <Text style={screenStyles.error}>{error}</Text> : null}
+        </View>
       </View>
     </View>
   );
