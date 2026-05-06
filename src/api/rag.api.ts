@@ -1,4 +1,4 @@
-import { apiFetch } from "@/src/api/client";
+import { apiClient } from "@/src/lib/axios";
 
 export type ConversationState = {
   lastPolicyQuestion: string;
@@ -41,10 +41,12 @@ export type AskPolicyResponse = {
   error?: string;
 };
 
-export function askPolicyQuestion(payload: AskPolicyRequest) {
-  return apiFetch<AskPolicyResponse>("/api/rag/v1/ask", {
-    method: "POST",
-    body: JSON.stringify(payload),
-    auth: false,
+export async function askPolicyQuestion(payload: AskPolicyRequest) {
+  const { data } = await apiClient.post<AskPolicyResponse>("/api/rag/v1/ask", payload, {
+    meta: {
+      auth: true,
+    },
   });
+
+  return data;
 }

@@ -4,13 +4,14 @@ import { Linking, Text, TouchableOpacity, View } from "react-native";
 import { useAuthStore } from "@/src/features/auth/store/auth-store";
 import { env } from "@/src/lib/env";
 import { deleteSecureItem, storageKeys } from "@/src/lib/secure-storage";
+import { supabase } from "@/src/lib/supabase";
 import { screenStyles } from "@/src/theme/styles";
 
 export default function SettingsScreen() {
   const user = useAuthStore((state) => state.user);
   const signOut = useAuthStore((state) => state.signOut);
   const displayName = user?.username ?? "Preview User";
-  const clearance = user?.clearance ?? "Workspace";
+  const clearance = user?.clearanceLevel ?? "Workspace";
   const initials = displayName
     .split(/[\s._-]+/)
     .filter(Boolean)
@@ -24,6 +25,7 @@ export default function SettingsScreen() {
   };
 
   const handleSignOut = async () => {
+    await supabase.auth.signOut();
     await signOut();
     router.replace("/(auth)/login");
   };

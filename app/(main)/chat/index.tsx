@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
   ActivityIndicator,
   FlatList,
@@ -12,6 +12,7 @@ import {
 } from "react-native";
 import { useAskPolicyQuestion } from "@/src/features/chat/hooks/use-ask-policy-question";
 import { useChatStore } from "@/src/features/chat/store/chat-store";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { screenStyles } from "@/src/theme/styles";
 
 const STARTER_PROMPTS = [
@@ -28,7 +29,9 @@ const QUICK_TOPICS = [
 ] as const;
 
 export default function ChatScreen() {
+  const insets = useSafeAreaInsets();
   const [question, setQuestion] = useState("");
+  const listRef = useRef<FlatList>(null);
   const activeThreadId = useChatStore((state) => state.activeThreadId);
   const thread = useChatStore((state) => state.threads[activeThreadId]);
   const appendMessage = useChatStore((state) => state.appendMessage);
@@ -36,6 +39,16 @@ export default function ChatScreen() {
   const askMutation = useAskPolicyQuestion();
 
   const messages = thread?.messages ?? [];
+
+  useEffect(() => {
+    if (messages.length === 0) {
+      return;
+    }
+
+    requestAnimationFrame(() => {
+      listRef.current?.scrollToEnd({ animated: true });
+    });
+  }, [messages.length]);
 
   const sendQuestion = async (draft = question) => {
     const trimmedQuestion = draft.trim();
@@ -70,8 +83,8 @@ export default function ChatScreen() {
 
   return (
     <KeyboardAvoidingView
-      behavior={Platform.OS === "ios" ? "padding" : undefined}
-      keyboardVerticalOffset={Platform.OS === "ios" ? 84 : 0}
+      behavior={Platform.OS === "ios" ? "padding" : "height"}
+      keyboardVerticalOffset={Platform.OS === "ios" ? 84 : 20}
       style={screenStyles.chatScreen}
     >
       <View style={screenStyles.chatBackdropTop} />
@@ -111,9 +124,12 @@ export default function ChatScreen() {
           </View>
         ) : (
           <FlatList
+            ref={listRef}
             contentContainerStyle={screenStyles.chatListContent}
             data={messages}
             keyExtractor={(item) => item.id}
+            keyboardDismissMode="interactive"
+            keyboardShouldPersistTaps="handled"
             showsVerticalScrollIndicator={false}
             style={screenStyles.chatList}
             renderItem={({ item }) => (
@@ -145,6 +161,11 @@ export default function ChatScreen() {
             <TextInput
               multiline
               onChangeText={setQuestion}
+              onFocus={() => {
+                requestAnimationFrame(() => {
+                  listRef.current?.scrollToEnd({ animated: true });
+                });
+              }}
               placeholder="For example: What is our WFH policy?"
               placeholderTextColor="#8a8fa8"
               style={screenStyles.composerInput}
@@ -177,6 +198,8 @@ export default function ChatScreen() {
 
           {askMutation.error ? <Text style={screenStyles.error}>{askMutation.error.message}</Text> : null}
         </View>
+
+        <View style={{ height: Math.max(insets.bottom, 12) }} />
       </View>
     </KeyboardAvoidingView>
   );

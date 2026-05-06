@@ -7,6 +7,7 @@ Minimal Expo workspace aligned to the current backend.
 - Expo Router app shell
 - Username/password login against `/api/auth/v1/login`
 - Secure JWT persistence with `expo-secure-store`
+- Frontend network scaffolding for future multi-tenant support
 - Chat screen wired to `/api/rag/v1/ask`
 - Voice session create/teardown wired to `/api/rtc/v1/session`
 - Zustand stores for auth, chat, and voice state
@@ -100,3 +101,4 @@ adb reverse tcp:8081 tcp:8081
 - Do not use Expo Go for this project
 - Voice currently scaffolds session create/teardown only
 - Real LiveKit room UI can be added next
+- The frontend now stores an optional `network` with the auth session and sends `X-Network-Id` when available

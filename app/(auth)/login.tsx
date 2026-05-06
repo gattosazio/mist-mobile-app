@@ -62,7 +62,7 @@ export default function LoginScreen() {
   const { control, handleSubmit } = useForm<LoginFormValues>({
     resolver: zodResolver(loginSchema),
     defaultValues: {
-      username: "",
+      email: "",
       password: "",
     },
   });
@@ -318,7 +318,7 @@ export default function LoginScreen() {
                 <View style={screenStyles.authFormBlock}>
                   <Controller
                     control={control}
-                    name="username"
+                    name="email"
                     render={({ field, fieldState }) => (
                       <View style={screenStyles.field}>
                         <Text style={screenStyles.floatingLabel}>Work email</Text>

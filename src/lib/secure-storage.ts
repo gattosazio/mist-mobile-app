@@ -4,6 +4,8 @@ import { Platform } from "react-native";
 export const storageKeys = {
   authToken: "mist-auth-token",
   authUser: "mist-auth-user",
+  authNetwork: "mist-auth-network",
+  authMemberships: "mist-auth-memberships",
   onboardingSeen: "mist-onboarding-seen",
 } as const;
 

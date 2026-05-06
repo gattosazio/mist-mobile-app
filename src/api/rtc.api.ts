@@ -1,4 +1,4 @@
-import { apiFetch } from "@/src/api/client";
+import { apiClient } from "@/src/lib/axios";
 
 export type LiveKitSessionResponse = {
   sessionId: string;
@@ -15,16 +15,26 @@ export type CloseVoiceSessionResponse = {
   endReason?: string | null;
 };
 
-export function createVoiceSession() {
-  return apiFetch<LiveKitSessionResponse>("/api/rtc/v1/session", {
-    method: "POST",
-    auth: true,
-  });
+export async function createVoiceSession() {
+  const { data } = await apiClient.post<LiveKitSessionResponse>(
+    "/api/rtc/v1/session",
+    {},
+    {
+      meta: {
+        auth: true,
+      },
+    }
+  );
+
+  return data;
 }
 
-export function closeVoiceSession(sessionId: string) {
-  return apiFetch<CloseVoiceSessionResponse>(`/api/rtc/v1/session/${sessionId}`, {
-    method: "DELETE",
-    auth: true,
+export async function closeVoiceSession(sessionId: string) {
+  const { data } = await apiClient.delete<CloseVoiceSessionResponse>(`/api/rtc/v1/session/${sessionId}`, {
+    meta: {
+      auth: true,
+    },
   });
+
+  return data;
 }

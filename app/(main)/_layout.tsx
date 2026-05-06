@@ -7,7 +7,7 @@ import { screenStyles } from "@/src/theme/styles";
 export default function MainLayout() {
   const user = useAuthStore((state) => state.user);
   const displayName = user?.username ?? "Preview User";
-  const clearance = user?.clearance ?? "Workspace";
+  const clearance = user?.clearanceLevel ?? "Workspace";
   const initials = displayName
     .split(/[\s._-]+/)
     .filter(Boolean)
